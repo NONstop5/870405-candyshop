@@ -1,7 +1,7 @@
 # Личный проект «Кэндишоп» [![Build status][travis-image]][travis-url]
 
 * Студент: [Игорь Ильягуев](https://up.htmlacademy.ru/javascript/15/user/870405).
-* Наставник: `Неизвестно`.
+* Наставник: `Вова Куликов`.
 
 ---
 
