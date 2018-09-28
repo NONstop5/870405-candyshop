@@ -2,7 +2,7 @@
 
 // Функции
 var getRandomValue = function (maxValue) {
-  return Math.round(Math.random() * maxValue);
+  return Math.floor(Math.random() * maxValue);
 };
 
 var createNewElement = function (tagName, className, textContent) {
@@ -18,8 +18,8 @@ var createGoodsArray = function (goodsNumber, goodNames, imgPaths, rating, nutri
 
   for (var i = 0; i < goodsNumber; i++) {
     var good = {
-      'name': goodNames[getRandomValue(goodNames.length - 1)], // строка — название. Произвольная строка из нижеперечисленных
-      'picture': imgPaths[getRandomValue(imgPaths.length - 1)], // строка — адрес изображения для товара. Случайное значение из массива, содержащего
+      'name': goodNames[getRandomValue(goodNames.length)], // строка — название. Произвольная строка из нижеперечисленных
+      'picture': imgPaths[getRandomValue(imgPaths.length)], // строка — адрес изображения для товара. Случайное значение из массива, содержащего
       'amount': 1, // число — количество, число от 0 до 20
       'price': 105, // число — стоимость, от 100 до 1500
       'weight': 30, // число — вес в граммах, от 30 до 300
@@ -188,7 +188,7 @@ var nutritionFacts = {
       contentsNumber = 1;
     }
     for (var i = 0; i < contentsNumber; i++) {
-      contentsString += contents[getRandomValue(contents.length - 1)];
+      contentsString += contents[getRandomValue(contents.length)];
       if ((contentsNumber - i) > 1) {
         contentsString += ', ';
       }
