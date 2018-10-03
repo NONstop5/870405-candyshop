@@ -1,10 +1,11 @@
 'use strict';
 
-// Функции
+// Функция генерации случайного числа
 var getRandomValue = function (maxValue) {
   return Math.floor(Math.random() * maxValue);
 };
 
+// Функция создания нового элемента
 var createNewElement = function (tagName, className, textContent) {
   var newElement = document.createElement(tagName);
   newElement.classList.add(className);
@@ -13,31 +14,39 @@ var createNewElement = function (tagName, className, textContent) {
   return newElement;
 };
 
-var createGoodsArray = function (goodsNumber, goodNames, imgPaths, rating, nutritionFacts) {
+// Функция создания массива товаров каталога
+var createGoodsArray = function (dataSet) {
   var goods = [];
 
-  for (var i = 0; i < goodsNumber; i++) {
-    var good = {
-      'name': goodNames[getRandomValue(goodNames.length)], // строка — название. Произвольная строка из нижеперечисленных
-      'picture': imgPaths[getRandomValue(imgPaths.length)], // строка — адрес изображения для товара. Случайное значение из массива, содержащего
+  for (var i = 0; i < dataSet.goodsNumber; i++) {
+    goods[i] = {
+      'name': dataSet.goodNames[getRandomValue(goodNames.length)], // строка — название. Произвольная строка из нижеперечисленных
+      'picture': dataSet.imgPaths[getRandomValue(imgPaths.length)], // строка — адрес изображения для товара. Случайное значение из массива, содержащего
       'amount': 1, // число — количество, число от 0 до 20
       'price': 105, // число — стоимость, от 100 до 1500
       'weight': 30, // число — вес в граммах, от 30 до 300
-      'rating': rating, // объект — рейтинг: объект со следующими полями
-      'nutritionFacts': nutritionFacts // объект — состав: объект со следующими полями
+      'rating': dataSet.rating, // объект — рейтинг: объект со следующими полями
+      'nutritionFacts': dataSet.nutritionFacts // объект — состав: объект со следующими полями
     };
-
-    goods[i] = good;
   }
 
   return goods;
 };
 
+// Функция клонирования карточки товара для каталога
 var cloneCatalogGoodCardElement = function (goodCatalogCardTemplate, goodObj) {
   var goodCard = goodCatalogCardTemplate.cloneNode(true);
+  var amountClass = 'card--soon';
+  var cardImgElem = goodCard.querySelector('.card__img');
+  var cardPriceElement = goodCard.querySelector('.card__price');
+  var cardPriceFragment = document.createDocumentFragment();
+  var ratingValues = ['', 'stars__rating--one', 'stars__rating--two', 'stars__rating--three', 'stars__rating--four', 'stars__rating--five'];
+  var starsRatingElem = goodCard.querySelector('.stars__rating');
+  var withShugar = 'Содержит сахар';
+  var withoutShugar = 'Без сахара';
+  var shugarType = goodObj['nutritionFacts'].sugar ? withShugar : withoutShugar;
 
   // amount
-  var amountClass = 'card--soon';
   if (goodObj['amount'] > 5) {
     amountClass = 'card--in-stock';
   } else if (goodObj['amount'] >= 1 & goodObj['amount'] <= 5) {
@@ -46,48 +55,78 @@ var cloneCatalogGoodCardElement = function (goodCatalogCardTemplate, goodObj) {
   goodCard.classList.remove('card--in-stock');
   goodCard.classList.add(amountClass);
 
-  // name, picture
+  // name
   goodCard.querySelector('.card__title').textContent = goodObj['name'];
-  goodCard.querySelector('.card__img').src = goodObj['picture'];
-  goodCard.querySelector('.card__img').alt = goodObj['name'];
+
+  // picture
+  cardImgElem.src = goodObj['picture'];
+  cardImgElem.alt = goodObj['name'];
 
   // price
-  var cardPriceElement = goodCard.querySelector('.card__price');
   cardPriceElement.textContent = goodObj['price'] + ' ';
 
-  var cardPriceFragment = document.createDocumentFragment();
   cardPriceFragment.appendChild(createNewElement('span', 'card__currency', '₽'));
   cardPriceFragment.appendChild(createNewElement('span', 'card__weight', '/' + goodObj['weight'] + 'Г'));
 
   cardPriceElement.appendChild(cardPriceFragment);
 
-  //  rating
-  var ratingValues = ['', 'stars__rating--one', 'stars__rating--two', 'stars__rating--three', 'stars__rating--four', 'stars__rating--five'];
-  goodCard.querySelector('.stars__rating').classList.remove('stars__rating--five');
-  goodCard.querySelector('.stars__rating').classList.add(ratingValues[goodObj['rating'].value]);
+  // rating
+  starsRatingElem.classList.remove('stars__rating--five');
+  starsRatingElem.classList.add(ratingValues[goodObj['rating'].value]);
   goodCard.querySelector('.star__count').textContent = goodObj['rating'].number;
 
   // nutritionFacts
-  var isShugar = 'Без сахара';
-  if (goodObj['nutritionFacts'].sugar) {
-    isShugar = 'Содержит сахар';
-  }
-  goodCard.querySelector('.card__characteristic').textContent = isShugar + '. ' + goodObj['nutritionFacts'].energy + ' ккал';
-  goodCard.querySelector('.card__composition-list').textContent = goodObj['nutritionFacts'].contents();
+  goodCard.querySelector('.card__characteristic').textContent = shugarType + '. ' + goodObj['nutritionFacts'].energy + ' ккал';
+  goodCard.querySelector('.card__composition-list').textContent = goodObj['nutritionFacts'].generateContents();
 
   return goodCard;
 };
 
+// Функция клонирования карточки товара для карзины
 var cloneOrderGoodCardElement = function (goodOrderCardTemplate, goodObj) {
   var goodCard = goodOrderCardTemplate.cloneNode(true);
+  var cardOrderImg = goodCard.querySelector('.card-order__img');
 
   goodCard.querySelector('.card-order__title').textContent = goodObj['name'];
-  goodCard.querySelector('.card-order__img').src = goodObj['picture'];
-  goodCard.querySelector('.card-order__img').alt = goodObj['name'];
+  cardOrderImg.src = goodObj['picture'];
+  cardOrderImg.alt = goodObj['name'];
   goodCard.querySelector('.card-order__price').textContent = goodObj['price'] + ' ₽';
   goodCard.querySelector('.card-order__count').value = goodObj['amount'];
 
   return goodCard;
+};
+
+// Функция заполнения каталога товаров
+var fillGoodsCatalog = function (goodsCatalog) {
+  var catalogCards = document.querySelector('.catalog__cards');
+  var catalogLoad = document.querySelector('.catalog__load');
+  var goodCatalogCardTemplate = document.querySelector('#card').content.querySelector('article');
+  var goodsCardsFragment = document.createDocumentFragment();
+
+  catalogCards.classList.remove('catalog__cards--load');
+  catalogLoad.classList.add('visually-hidden');
+
+  goodsCatalog.forEach(function (goodObj) {
+    goodsCardsFragment.appendChild(cloneCatalogGoodCardElement(goodCatalogCardTemplate, goodObj));
+  });
+
+  catalogCards.appendChild(goodsCardsFragment);
+};
+
+// Функция заполнения карзины
+var fillGoodsCart = function (goodsInCart) {
+  var orderCards = document.querySelector('.goods__cards');
+  var goodOrderCardTemplate = document.querySelector('#card-order').content.querySelector('article');
+  var goodsCardsFragment = document.createDocumentFragment();
+
+  orderCards.classList.remove('goods__cards--empty');
+  orderCards.childNodes[1].style.display = 'none';
+
+  goodsInCart.forEach(function (goodObj) {
+    goodsCardsFragment.appendChild(cloneOrderGoodCardElement(goodOrderCardTemplate, goodObj));
+  });
+
+  orderCards.appendChild(goodsCardsFragment);
 };
 
 // Данные
@@ -181,7 +220,7 @@ var contents = [
 var nutritionFacts = {
   'sugar': true, // булево значение — содержание сахара. Значение генерируется случайным образом
   'energy': 70, // число — энергетическая ценность: целое число от 70 до 500
-  'contents': function () { // строка — состав: сгенерированная случайным образом строка. Для генерации состава нужно выбрать произвольное количество значений, перечисленных ниже и соединить их через запятую
+  'generateContents': function () { // строка — состав: сгенерированная случайным образом строка. Для генерации состава нужно выбрать произвольное количество значений, перечисленных ниже и соединить их через запятую
     var contentsString = '';
     var contentsNumber = getRandomValue(5);
     if (contentsNumber === 0) {
@@ -197,36 +236,21 @@ var nutritionFacts = {
   }
 };
 
-var goodsCardsFragment = document.createDocumentFragment();
-
-// Заполняем каталог товаров
-var catalogCards = document.querySelector('.catalog__cards');
-catalogCards.classList.remove('catalog__cards--load');
-
-var catalogLoad = document.querySelector('.catalog__load');
-catalogLoad.classList.add('visually-hidden');
-
-var goodCatalogCardTemplate = document.querySelector('#card').content.querySelector('article');
-
-var goodsCatalog = createGoodsArray(26, goodNames, imgPaths, rating, nutritionFacts);
-
-goodsCatalog.forEach(function (goodObj) {
-  goodsCardsFragment.appendChild(cloneCatalogGoodCardElement(goodCatalogCardTemplate, goodObj));
+var goodsCatalog = createGoodsArray({
+  goodsNumber: 26,
+  goodNames: goodNames,
+  imgPaths: imgPaths,
+  rating: rating,
+  nutritionFacts: nutritionFacts
 });
 
-catalogCards.appendChild(goodsCardsFragment);
-
-// Заполняем карзину
-var orderCards = document.querySelector('.goods__cards');
-orderCards.classList.remove('goods__cards--empty');
-orderCards.childNodes[1].style.display = 'none';
-
-var goodOrderCardTemplate = document.querySelector('#card-order').content.querySelector('article');
-
-var goodsInCart = createGoodsArray(3, goodNames, imgPaths, rating, nutritionFacts);
-
-goodsInCart.forEach(function (goodObj) {
-  goodsCardsFragment.appendChild(cloneOrderGoodCardElement(goodOrderCardTemplate, goodObj));
+var goodsInCart = createGoodsArray({
+  goodsNumber: 3,
+  goodNames: goodNames,
+  imgPaths: imgPaths,
+  rating: rating,
+  nutritionFacts: nutritionFacts
 });
 
-orderCards.appendChild(goodsCardsFragment);
+fillGoodsCatalog(goodsCatalog);
+fillGoodsCart(goodsInCart);
