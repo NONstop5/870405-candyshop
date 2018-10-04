@@ -33,10 +33,20 @@ var createGoodsArray = function (dataSet) {
   return goods;
 };
 
+// Функция получения класса, в зависимости от количества
+var getAmmountClass = function (goodObj) {
+  var amountClass = 'card--soon';
+  if (goodObj['amount'] > 5) {
+    amountClass = 'card--in-stock';
+  } else if (goodObj['amount'] >= 1 & goodObj['amount'] <= 5) {
+    amountClass = 'card--little';
+  }
+  return amountClass;
+};
+
 // Функция клонирования карточки товара для каталога
 var cloneCatalogGoodCardElement = function (goodCatalogCardTemplate, goodObj) {
   var goodCard = goodCatalogCardTemplate.cloneNode(true);
-  var amountClass = 'card--soon';
   var cardImgElem = goodCard.querySelector('.card__img');
   var cardPriceElement = goodCard.querySelector('.card__price');
   var cardPriceFragment = document.createDocumentFragment();
@@ -47,13 +57,8 @@ var cloneCatalogGoodCardElement = function (goodCatalogCardTemplate, goodObj) {
   var shugarType = goodObj['nutritionFacts'].sugar ? withShugar : withoutShugar;
 
   // amount
-  if (goodObj['amount'] > 5) {
-    amountClass = 'card--in-stock';
-  } else if (goodObj['amount'] >= 1 & goodObj['amount'] <= 5) {
-    amountClass = 'card--little';
-  }
   goodCard.classList.remove('card--in-stock');
-  goodCard.classList.add(amountClass);
+  goodCard.classList.add(getAmmountClass(goodObj));
 
   // name
   goodCard.querySelector('.card__title').textContent = goodObj['name'];
