@@ -152,6 +152,16 @@ var hideBasketEmptyText = function (basketElem) {
   basketElem.firstElementChild.style.display = 'none';
 };
 
+// Функция показывает текст о пустой корзине товаров
+var showBasketEmptytext = function (basketFooter, basketHeaderText) {
+  var basketEmptyTemplate = document.querySelector('#cards-empty').content.querySelector('goods__card-empty');
+  var basketFragment = document.createDocumentFragment();
+
+  basketFragment.appendChild(basketEmptyTemplate);
+  basketFooter.appendChild(basketFragment);
+  basketHeaderText.textContent = 'В корзине ничего нет';
+};
+
 // Функция показывает итоговый блок в карзине товаров
 var showBasketGoodsTotal = function (basketGoodsTotal) {
   basketGoodsTotal.classList.remove('visually-hidden');
@@ -246,11 +256,9 @@ var calculateBasketAmount = function () {
   var basketGoodsNumberText;
   var basketGoodsNumber = 0;
   var basketMoneyAmount = 0;
-  var basketGoodsTotal = document.querySelector('.goods__total');
-  var basketGoodsTotalText = basketGoodsTotal.querySelector('.goods__total-count');
+  var basketFooter = document.querySelector('.goods__total');
+  var basketFooterText = basketFooter.querySelector('.goods__total-count');
   var basketHeaderText = document.querySelector('.main-header__basket');
-  var basketEmptyTemplate = document.querySelector('#cards-empty').content.querySelector('goods__card-empty');
-  var basketFragment = document.createDocumentFragment();
 
   goodsBasket.forEach(function (goodObj) {
     basketGoodsNumber += goodObj.orderedAmount;
@@ -259,15 +267,13 @@ var calculateBasketAmount = function () {
 
   if (basketGoodsNumber > 0) {
     basketGoodsNumberText = 'Итого за ' + basketGoodsNumber + ' товаров: ';
-    basketGoodsTotalText.textContent = basketGoodsNumberText;
-    basketGoodsTotalText.appendChild(createNewElement('span', 'goods__price', basketMoneyAmount + ' ₽'));
+    basketFooterText.textContent = basketGoodsNumberText;
+    basketFooterText.appendChild(createNewElement('span', 'goods__price', basketMoneyAmount + ' ₽'));
 
     basketHeaderText.textContent = basketGoodsNumberText;
     basketHeaderText.appendChild(createNewElement('span', 'goods__price', basketMoneyAmount + ' ₽'));
   } else {
-    basketFragment.appendChild(basketEmptyTemplate);
-    basketGoodsTotal.appendChild(basketFragment);
-    basketHeaderText.textContent = 'В корзине ничего нет';
+    showBasketEmptytext(basketFooter, basketHeaderText);
   }
 };
 
@@ -328,6 +334,7 @@ var decreaseBasketGoodCount = function (basket, goodId) {
 
 // Функция увеличивает количества товара в корзине
 var increaseBasketGoodCount = function (basket, goodId) {
+  var goodOrderCount;
   // Проверяем наличие товара
   if (goodsCatalog[goodId]['amount'] === 0) {
     return;
@@ -335,7 +342,7 @@ var increaseBasketGoodCount = function (basket, goodId) {
   for (var i = 0; i < goodsBasket.length; i++) {
     if (goodsBasket[i]['id'] === goodId) {
       goodsBasket[i]['orderedAmount']++;
-      var goodOrderCount = basket.children[i + 1].querySelector('.card-order__count');
+      goodOrderCount = basket.children[i + 1].querySelector('.card-order__count');
       goodOrderCount.value = goodsBasket[i]['orderedAmount'];
       decreaseGoodCatalogAmount(goodId);
       calculateBasketAmount();
@@ -365,12 +372,12 @@ var addGoodToBasket = function (goodId) {
 
   // Проверяем есть ли уже в корзине такой товар
   if (goodsBasket.length > 0) {
-    goodsBasket.forEach(function (goodInBasket) {
-      if (goodInBasket['id'] === goodId) {
+    for (var i = 0; i < goodsBasket.length; i++) {
+      if (goodsBasket[i]['id'] === goodId) {
         increaseBasketGoodCount(basket, goodId);
         return;
       }
-    });
+    }
   }
 
   delete newGoodObjForBasket.amount;
