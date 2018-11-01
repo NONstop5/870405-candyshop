@@ -512,12 +512,31 @@ var addDeliverEvents = function (deliverForm) {
   });
 };
 
+
+// Навешиваем события на ползунок фильтра
+var addPriceFilterEvents = function (rangePriceFilter) {
+  rangePriceFilter.addEventListener('mouseup', function (evt) {
+    var rangeBtnClassName = evt.target.className;
+    var rangePriceText = rangePriceFilter.nextElementSibling;
+    var rangePriceMinText = rangePriceText.children[0];
+    var rangePriceMaxText = rangePriceText.children[1];
+
+    if (rangeBtnClassName === 'range__btn range__btn--left') {
+      rangePriceMinText.textContent = '0';
+    }
+    if (rangeBtnClassName === 'range__btn range__btn--right') {
+      rangePriceMaxText.textContent = '100';
+    }
+  });
+};
+
 // Функция основных действий
 var main = function () {
   var catalogCards = document.querySelector('.catalog__cards');
   var basketGoodsCards = document.querySelector('.goods__cards');
   var paymentForm = document.querySelector('.payment__inner');
   var deliverForm = document.querySelector('.deliver');
+  var rangePriceFilter = document.querySelector('.range__filter');
 
   fillGoodsCatalog(catalogCards);
 
@@ -528,6 +547,8 @@ var main = function () {
   addPaymentEvents(paymentForm);
 
   addDeliverEvents(deliverForm);
+
+  addPriceFilterEvents(rangePriceFilter);
 };
 
 var goodsCatalog = createGoodsArray({
