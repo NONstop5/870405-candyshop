@@ -377,6 +377,26 @@ var removeGoodFromBasket = function (goodId) {
   }
 };
 
+// Функция заполнения каталога товаров
+var fillGoodsCatalog = function (catalogCards) {
+  var catalogLoad = document.querySelector('.catalog__load');
+  var goodCatalogCardTemplate = document.querySelector('#card').content.querySelector('article');
+  var goodsCardsFragment = document.createDocumentFragment();
+
+  hideLoadText(catalogCards, catalogLoad);
+
+  goodsCatalog.forEach(function (goodObj, i) {
+    goodObj['id'] = i;
+    var elementData = cloneCatalogGoodCardElement({
+      goodCatalogCardTemplate: goodCatalogCardTemplate,
+      goodObj: goodObj,
+    });
+    goodsCardsFragment.appendChild(elementData);
+  });
+
+  catalogCards.appendChild(goodsCardsFragment);
+};
+
 // Функция добавления товара в карзину
 var addGoodToBasket = function (goodId) {
   var basketGoodsCards = document.querySelector('.goods__cards');
@@ -462,36 +482,52 @@ var addBasketEvents = function (basketGoodsCards) {
   });
 };
 
-// Функция заполнения каталога товаров
-var fillGoodsCatalog = function (catalogCards) {
-  var catalogLoad = document.querySelector('.catalog__load');
-  var goodCatalogCardTemplate = document.querySelector('#card').content.querySelector('article');
-  var goodsCardsFragment = document.createDocumentFragment();
-
-  hideLoadText(catalogCards, catalogLoad);
-
-  goodsCatalog.forEach(function (goodObj, i) {
-    goodObj['id'] = i;
-    var elementData = cloneCatalogGoodCardElement({
-      goodCatalogCardTemplate: goodCatalogCardTemplate,
-      goodObj: goodObj,
-    });
-    goodsCardsFragment.appendChild(elementData);
+// Навешиваем события на блок оплаты
+var addPaymentEvents = function (paymentForm) {
+  paymentForm.addEventListener('click', function (evt) {
+    var activePaymentPage = paymentForm.querySelector(evt.target.control.id);
+    activePaymentPage.classList.toggle('visually-hidden');
   });
+};
 
-  catalogCards.appendChild(goodsCardsFragment);
+// Навешиваем события на блок доставки
+var addDeliverEvents = function (deliverForm) {
+  deliverForm.addEventListener('click', function (evt) {
+    var deliverStorePage = deliverForm.querySelector('.deliver__store');
+    var deliverCourierPage = deliverForm.querySelector('.deliver__courier');
+
+    if (evt.target.control === undefined) {
+      return;
+    }
+    var tabId = evt.target.control.id;
+
+    if (tabId === 'deliver__store') {
+      deliverStorePage.classList.remove('visually-hidden');
+      deliverCourierPage.classList.add('visually-hidden');
+    }
+    if (tabId === 'deliver__courier') {
+      deliverStorePage.classList.add('visually-hidden');
+      deliverCourierPage.classList.remove('visually-hidden');
+    }
+  });
 };
 
 // Функция основных действий
 var main = function () {
   var catalogCards = document.querySelector('.catalog__cards');
   var basketGoodsCards = document.querySelector('.goods__cards');
+  var paymentForm = document.querySelector('.payment__inner');
+  var deliverForm = document.querySelector('.deliver');
 
   fillGoodsCatalog(catalogCards);
 
   addGoodCatalogEvents(catalogCards);
 
   addBasketEvents(basketGoodsCards);
+
+  addPaymentEvents(paymentForm);
+
+  addDeliverEvents(deliverForm);
 };
 
 var goodsCatalog = createGoodsArray({
@@ -505,4 +541,3 @@ var goodsCatalog = createGoodsArray({
 var goodsBasket = [];
 
 main();
-
