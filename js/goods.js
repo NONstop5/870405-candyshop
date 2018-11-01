@@ -485,21 +485,33 @@ var addBasketEvents = function (basketGoodsCards) {
 // Навешиваем события на блок оплаты
 var addPaymentEvents = function (paymentForm) {
   paymentForm.addEventListener('click', function (evt) {
-    var activePaymentPage = paymentForm.querySelector(evt.target.control.id);
-    activePaymentPage.classList.toggle('visually-hidden');
+    if (evt.target.control === undefined) {
+      return;
+    }
+    var tabId = evt.target.control.id;
+    var paymentCardPage = paymentForm.querySelector('.payment__card-wrap');
+    var paymentCashPage = paymentForm.querySelector('.payment__cash-wrap');
+
+    if (tabId === 'payment__card') {
+      paymentCardPage.classList.remove('visually-hidden');
+      paymentCashPage.classList.add('visually-hidden');
+    }
+    if (tabId === 'payment__cash') {
+      paymentCardPage.classList.add('visually-hidden');
+      paymentCashPage.classList.remove('visually-hidden');
+    }
   });
 };
 
 // Навешиваем события на блок доставки
 var addDeliverEvents = function (deliverForm) {
   deliverForm.addEventListener('click', function (evt) {
-    var deliverStorePage = deliverForm.querySelector('.deliver__store');
-    var deliverCourierPage = deliverForm.querySelector('.deliver__courier');
-
     if (evt.target.control === undefined) {
       return;
     }
     var tabId = evt.target.control.id;
+    var deliverStorePage = deliverForm.querySelector('.deliver__store');
+    var deliverCourierPage = deliverForm.querySelector('.deliver__courier');
 
     if (tabId === 'deliver__store') {
       deliverStorePage.classList.remove('visually-hidden');
