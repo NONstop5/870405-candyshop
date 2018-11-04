@@ -265,11 +265,16 @@ var cloneBasketGoodCardElement = function (elementData) {
   elementData.basketElem.appendChild(goodsCardsFragment);
 };
 
-var setAvailableFormFields = function (flag) {
+var setAvailableFormFields = function (flag, inputGroupClass) {
   var buySection = document.querySelector('.buy');
   var formFields = buySection.querySelector('form');
   var inputFields = formFields.querySelectorAll('input');
-  var fieldSetTags = formFields.querySelectorAll('fieldset');
+
+  if (inputGroupClass !== undefined) {
+    var inputGroup = formFields.querySelector(inputGroupClass);
+    inputFields = inputGroup.querySelectorAll('input');
+  }
+
   for (var i = 0; i < inputFields.length; i++) {
     if (flag) {
       inputFields[i].removeAttribute('disabled');
@@ -278,11 +283,15 @@ var setAvailableFormFields = function (flag) {
     }
   }
 
-  for (i = 0; i < fieldSetTags.length; i++) {
-    if (flag) {
-      fieldSetTags[i].removeAttribute('disabled');
-    } else {
-      fieldSetTags[i].setAttribute('disabled', '');
+  if (inputGroupClass === undefined || inputGroupClass === '') {
+    var fieldSetTags = formFields.querySelectorAll('fieldset');
+
+    for (i = 0; i < fieldSetTags.length; i++) {
+      if (flag) {
+        fieldSetTags[i].removeAttribute('disabled');
+      } else {
+        fieldSetTags[i].setAttribute('disabled', '');
+      }
     }
   }
 };
@@ -510,7 +519,7 @@ var addBasketEvents = function (basketGoodsCards) {
 // Навешиваем события на блок оплаты
 var addPaymentEvents = function (paymentForm) {
   paymentForm.addEventListener('click', function (evt) {
-    if (evt.target.control === undefined) {
+    if (evt.target.control === undefined || goodsBasket.length === 0) {
       return;
     }
     var tabId = evt.target.control.id;
@@ -524,6 +533,7 @@ var addPaymentEvents = function (paymentForm) {
     if (tabId === 'payment__cash') {
       paymentCardPage.classList.add('visually-hidden');
       paymentCashPage.classList.remove('visually-hidden');
+      setAvailableFormFields(false, '.payment__inputs');
     }
   });
 /*
@@ -545,7 +555,7 @@ var addPaymentEvents = function (paymentForm) {
 // Навешиваем события на блок доставки
 var addDeliverEvents = function (deliverForm) {
   deliverForm.addEventListener('click', function (evt) {
-    if (evt.target.control === undefined) {
+    if (evt.target.control === undefined || goodsBasket.length === 0) {
       return;
     }
     var tabId = evt.target.control.id;
@@ -562,7 +572,6 @@ var addDeliverEvents = function (deliverForm) {
     }
   });
 };
-
 
 // Навешиваем события на ползунок фильтра
 var addPriceFilterEvents = function (rangePriceFilter) {
