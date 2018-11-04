@@ -265,6 +265,28 @@ var cloneBasketGoodCardElement = function (elementData) {
   elementData.basketElem.appendChild(goodsCardsFragment);
 };
 
+var setAvailableFormFields = function (flag) {
+  var buySection = document.querySelector('.buy');
+  var formFields = buySection.querySelector('form');
+  var inputFields = formFields.querySelectorAll('input');
+  var fieldSetTags = formFields.querySelectorAll('fieldset');
+  for (var i = 0; i < inputFields.length; i++) {
+    if (flag) {
+      inputFields[i].removeAttribute('disabled');
+    } else {
+      inputFields[i].setAttribute('disabled', '');
+    }
+  }
+
+  for (i = 0; i < fieldSetTags.length; i++) {
+    if (flag) {
+      fieldSetTags[i].removeAttribute('disabled');
+    } else {
+      fieldSetTags[i].setAttribute('disabled', '');
+    }
+  }
+};
+
 // Функция считает итоговые сумму и количество товаров в корзине
 var calculateBasketAmount = function (basketGoodsCards) {
   var basketGoodsNumberText;
@@ -290,6 +312,7 @@ var calculateBasketAmount = function (basketGoodsCards) {
     showBasketEmptyText(basketGoodsCards);
     showBasketHeaderEmptyText(basketHeaderText);
     hideBasketGoodsTotal(basketGoodsTotal);
+    setAvailableFormFields(false);
   }
 };
 
@@ -419,6 +442,8 @@ var addGoodToBasket = function (goodId) {
 
   hideBasketEmptyText(basketGoodsCards);
 
+  setAvailableFormFields(true);
+
   showBasketGoodsTotal(basketGoodsTotal);
 
   cloneBasketGoodCardElement({
@@ -501,6 +526,20 @@ var addPaymentEvents = function (paymentForm) {
       paymentCashPage.classList.remove('visually-hidden');
     }
   });
+/*
+  paymentForm.addEventListener('onfocus', function (evt) {
+
+  });
+*/
+/*
+  paymentForm.addEventListener('keydown', function (evt) {
+    var tagId = evt.target.id;
+    // evt.keyCode === 13
+    if (tagId === 'payment__card-number') {
+      alert('asd');
+    }
+  });
+  */
 };
 
 // Навешиваем события на блок доставки
@@ -546,7 +585,7 @@ var addPriceFilterEvents = function (rangePriceFilter) {
 var main = function () {
   var catalogCards = document.querySelector('.catalog__cards');
   var basketGoodsCards = document.querySelector('.goods__cards');
-  var paymentForm = document.querySelector('.payment__inner');
+  var paymentForm = document.querySelector('.payment');
   var deliverForm = document.querySelector('.deliver');
   var rangePriceFilter = document.querySelector('.range__filter');
 
