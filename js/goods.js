@@ -112,6 +112,59 @@ var getRandomValue = function (maxValue) {
   return Math.floor(Math.random() * maxValue);
 };
 
+// Функция проверки корректности номера кредитной карты
+var checkCreditCardNumber = function (cardNumValue) {
+  var charNumArr = cardNumValue.split('');
+  var cardNumSum = 0;
+  var charNumInt;
+  var i = 0;
+
+  if (cardNumValue.length !== 16) {
+    return false;
+  }
+
+  while (i < charNumArr.length) {
+    charNumInt = parseInt(charNumArr[i], 10);
+    if (i % 2 === 0) {
+      charNumInt = charNumInt * 2;
+      charNumInt = charNumInt >= 10 ? (charNumInt - 9) : charNumInt;
+    }
+    cardNumSum += charNumInt;
+    i++;
+  }
+
+  return !(cardNumSum % 10);
+};
+
+// Функция проверки корректности exp кредитной карты
+var checkCreditCardExp = function (cardExpValue) {
+  var regexp = /([0-1]{1}[0-9]{1}\/[0-2]{1}[0-9]{1})/;
+
+  if (cardExpValue.length !== 5) {
+    return false;
+  }
+
+  return regexp.test(cardExpValue);
+};
+
+// Функция проверки корректности cvc кредитной карты
+var checkCreditCardCvc = function (cardCvcValue) {
+  if (cardCvcValue.length !== 3 || cardCvcValue < 100 || cardCvcValue > 999) {
+    return false;
+  }
+
+  return true;
+};
+
+// Функция проверки корректности имени владельца кредитной карты
+var checkCreditCardHolder = function (cardHolderValue) {
+  if (cardHolderValue.length < 3) {
+    return false;
+  }
+
+  return true;
+};
+
 // Функция создания нового элемента
 var createNewElement = function (tagName, className, textContent) {
   var newElement = document.createElement(tagName);
@@ -518,13 +571,18 @@ var addBasketEvents = function (basketGoodsCards) {
 
 // Навешиваем события на блок оплаты
 var addPaymentEvents = function (paymentForm) {
+  var paymentCardPage = paymentForm.querySelector('.payment__card-wrap');
+  var paymentCashPage = paymentForm.querySelector('.payment__cash-wrap');
+  var cardNumber = document.getElementById('payment__card-number');
+  var cardExp = document.getElementById('payment__card-date');
+  var cardCvc = document.getElementById('payment__card-cvc');
+  var cardHolder = document.getElementById('payment__cardholder');
+
   paymentForm.addEventListener('click', function (evt) {
     if (evt.target.control === undefined || goodsBasket.length === 0) {
       return;
     }
     var tabId = evt.target.control.id;
-    var paymentCardPage = paymentForm.querySelector('.payment__card-wrap');
-    var paymentCashPage = paymentForm.querySelector('.payment__cash-wrap');
 
     if (tabId === 'payment__card') {
       paymentCardPage.classList.remove('visually-hidden');
@@ -536,20 +594,22 @@ var addPaymentEvents = function (paymentForm) {
       setAvailableFormFields(false, '.payment__inputs');
     }
   });
-/*
-  paymentForm.addEventListener('onfocus', function (evt) {
 
-  });
-*/
-/*
-  paymentForm.addEventListener('keydown', function (evt) {
-    var tagId = evt.target.id;
-    // evt.keyCode === 13
-    if (tagId === 'payment__card-number') {
-      alert('asd');
+  paymentForm.addEventListener('keyup', function () {
+    var paymentCardStatus = paymentForm.querySelector('.payment__card-status');
+    var checkResult = true;
+
+    checkResult = checkResult && checkCreditCardNumber(cardNumber.value);
+    checkResult = checkResult && checkCreditCardExp(cardExp.value);
+    checkResult = checkResult && checkCreditCardCvc(cardCvc.value);
+    checkResult = checkResult && checkCreditCardHolder(cardHolder.value);
+
+    if (checkResult) {
+      paymentCardStatus.textContent = 'одобрен';
+    } else {
+      paymentCardStatus.textContent = 'не определен';
     }
   });
-  */
 };
 
 // Навешиваем события на блок доставки
