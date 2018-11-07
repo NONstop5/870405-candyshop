@@ -1,115 +1,12 @@
 'use strict';
 
-// Данные
-var goodNames = [
-  'Чесночные сливки',
-  'Огуречный педант',
-  'Молочная хрюша',
-  'Грибной шейк',
-  'Баклажановое безумие',
-  'Паприколу итальяно',
-  'Нинзя-удар васаби',
-  'Хитрый баклажан',
-  'Горчичный вызов',
-  'Кедровая липучка',
-  'Корманный портвейн',
-  'Чилийский задира',
-  'Беконовый взрыв',
-  'Арахис vs виноград',
-  'Сельдерейная душа',
-  'Початок в бутылке',
-  'Чернющий мистер чеснок',
-  'Раша федераша',
-  'Кислая мина',
-  'Кукурузное утро',
-  'Икорный фуршет',
-  'Новогоднее настроение',
-  'С пивком потянет',
-  'Мисс креветка',
-  'Бесконечный взрыв',
-  'Невинные винные',
-  'Бельгийское пенное',
-  'Острый язычок'];
+// Константы
+var IMG_PATH = 'img/cards/';
+var IMG_EXTENSION = '.jpg';
 
-var imgPaths = [
-  'img/cards/gum-cedar.jpg',
-  'img/cards/gum-chile.jpg',
-  'img/cards/gum-eggplant.jpg',
-  'img/cards/gum-mustard.jpg',
-  'img/cards/gum-portwine.jpg',
-  'img/cards/gum-wasabi.jpg',
-  'img/cards/ice-cucumber.jpg',
-  'img/cards/ice-eggplant.jpg',
-  'img/cards/ice-garlic.jpg',
-  'img/cards/ice-italian.jpg',
-  'img/cards/ice-mushroom.jpg',
-  'img/cards/ice-pig.jpg',
-  'img/cards/marmalade-beer.jpg',
-  'img/cards/marmalade-caviar.jpg',
-  'img/cards/marmalade-corn.jpg',
-  'img/cards/marmalade-new-year.jpg',
-  'img/cards/marmalade-sour.jpg',
-  'img/cards/marshmallow-bacon.jpg',
-  'img/cards/marshmallow-beer.jpg',
-  'img/cards/marshmallow-shrimp.jpg',
-  'img/cards/marshmallow-spicy.jpg',
-  'img/cards/marshmallow-wine.jpg',
-  'img/cards/soda-bacon.jpg',
-  'img/cards/soda-celery.jpg',
-  'img/cards/soda-cob.jpg',
-  'img/cards/soda-garlic.jpg',
-  'img/cards/soda-peanut-grapes.jpg',
-  'img/cards/soda-russian.jpg'
-];
-
-var rating = {
-  'value': 1, // число — оценка: целое число от 1 до 5
-  'number': 15 // число — количество оценок: целое число от 10 до 900
-};
-
-var contents = [
-  'молоко',
-  'сливки',
-  'вода',
-  'пищевой краситель',
-  'патока',
-  'ароматизатор бекона',
-  'ароматизатор свинца',
-  'ароматизатор дуба, идентичный натуральному',
-  'ароматизатор картофеля',
-  'лимонная кислота',
-  'загуститель',
-  'эмульгатор',
-  'консервант: сорбат калия',
-  'посолочная смесь: соль, нитрит натрия',
-  'ксилит',
-  'карбамид',
-  'вилларибо',
-  'виллабаджо'
-];
-
-var nutritionFacts = {
-  'sugar': true, // булево значение — содержание сахара. Значение генерируется случайным образом
-  'energy': 70, // число — энергетическая ценность: целое число от 70 до 500
-  'generateContents': function () { // строка — состав: сгенерированная случайным образом строка. Для генерации состава нужно выбрать произвольное количество значений, перечисленных ниже и соединить их через запятую
-    var contentsString = '';
-    var contentsNumber = getRandomValue(5);
-    if (contentsNumber === 0) {
-      contentsNumber = 1;
-    }
-    for (var i = 0; i < contentsNumber; i++) {
-      contentsString += contents[getRandomValue(contents.length)];
-      if ((contentsNumber - i) > 1) {
-        contentsString += ', ';
-      }
-    }
-    return contentsString;
-  }
-};
-
-// Функция генерации случайного числа
-var getRandomValue = function (maxValue) {
-  return Math.floor(Math.random() * maxValue);
+// Функция генерации целого случайного числа из заданного диапазона
+var getRandomValueRange = function (minValue, maxValue) {
+  return Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue;
 };
 
 // Функция проверки корректности номера кредитной карты
@@ -138,31 +35,20 @@ var checkCreditCardNumber = function (cardNumValue) {
 
 // Функция проверки корректности exp кредитной карты
 var checkCreditCardExp = function (cardExpValue) {
-  var regexp = /([0-1]{1}[0-9]{1}\/[0-2]{1}[0-9]{1})/;
+  var regexp = /^([01]{1}[0-9]{1}\/[1-3]{1}[0-9]{1})$/;
+  var result = cardExpValue.length !== 5 ? false : regexp.test(cardExpValue);
 
-  if (cardExpValue.length !== 5) {
-    return false;
-  }
-
-  return regexp.test(cardExpValue);
+  return result;
 };
 
 // Функция проверки корректности cvc кредитной карты
 var checkCreditCardCvc = function (cardCvcValue) {
-  if (cardCvcValue.length !== 3 || cardCvcValue < 100 || cardCvcValue > 999) {
-    return false;
-  }
-
-  return true;
+  return (cardCvcValue.length === 3 && cardCvcValue >= 100 && cardCvcValue <= 999);
 };
 
 // Функция проверки корректности имени владельца кредитной карты
 var checkCreditCardHolder = function (cardHolderValue) {
-  if (cardHolderValue.length < 3) {
-    return false;
-  }
-
-  return true;
+  return cardHolderValue.length >= 3;
 };
 
 // Функция создания нового элемента
@@ -180,11 +66,11 @@ var createGoodsArray = function (dataSet) {
 
   for (var i = 0; i < dataSet.goodsNumber; i++) {
     goods[i] = {
-      'name': dataSet.goodNames[getRandomValue(goodNames.length)], // строка — название. Произвольная строка из нижеперечисленных
-      'picture': dataSet.imgPaths[getRandomValue(imgPaths.length)], // строка — адрес изображения для товара. Случайное значение из массива, содержащего
-      'amount': 2, // число — количество, число от 0 до 20
-      'price': 105, // число — стоимость, от 100 до 1500
-      'weight': 30, // число — вес в граммах, от 30 до 300
+      'name': dataSet.goodNames[getRandomValueRange(goodNames.length)], // строка — название. Произвольная строка из нижеперечисленных
+      'picture': IMG_PATH + dataSet.imgPaths[getRandomValueRange(1, imgNames.length)] + IMG_EXTENSION, // строка — адрес изображения для товара. Случайное значение из массива, содержащего
+      'amount': getRandomValueRange(0, 20), // число — количество, число от 0 до 20
+      'price': getRandomValueRange(100, 1500), // число — стоимость, от 100 до 1500
+      'weight': getRandomValueRange(30, 300), // число — вес в граммах, от 30 до 300
       'rating': dataSet.rating, // объект — рейтинг: объект со следующими полями
       'nutritionFacts': dataSet.nutritionFacts // объект — состав: объект со следующими полями
     };
@@ -199,7 +85,7 @@ var hideLoadText = function (catalogCards, catalogLoad) {
   catalogLoad.classList.add('visually-hidden');
 };
 
-// Функция показывает текст в заголовкео пустой корзине товаров
+// Функция показывает текст в заголовке о пустой корзине товаров
 var showBasketHeaderEmptyText = function (basketHeaderText) {
   basketHeaderText.textContent = 'В корзине ничего нет';
 };
@@ -237,7 +123,7 @@ var getAmmountClass = function (goodObj) {
   return amountClass;
 };
 
-// Функция устанавливает класс для rfhnjxrb товара в каталоге
+// Функция устанавливает класс для карточки товара в каталоге
 var setAmountGoodClases = function (catalogGoodCard, goodId) {
   catalogGoodCard.classList.remove('card--soon');
   catalogGoodCard.classList.remove('card--little');
@@ -246,7 +132,7 @@ var setAmountGoodClases = function (catalogGoodCard, goodId) {
 };
 
 // Функция клонирования карточки товара для каталога
-var cloneCatalogGoodCardElement = function (elementData) {
+var createCatalogGoodCardElement = function (elementData) {
   var goodCard = elementData.goodCatalogCardTemplate.cloneNode(true);
   var cardImgElem = goodCard.querySelector('.card__img');
   var cardPriceElement = goodCard.querySelector('.card__price');
@@ -292,7 +178,7 @@ var cloneCatalogGoodCardElement = function (elementData) {
 };
 
 // Функция клонирования карточки товара для корзины
-var cloneBasketGoodCardElement = function (elementData) {
+var createBasketGoodCardElement = function (elementData) {
 
   var goodsCardsFragment = document.createDocumentFragment();
   var goodCard = elementData.goodBasketCardTemplate.cloneNode(true);
@@ -378,21 +264,12 @@ var calculateBasketAmount = function (basketGoodsCards) {
   }
 };
 
-// Функция уменьшает количества товара в каталоге
-var decreaseGoodCatalogAmount = function (goodId) {
+// Функция изменяет количества товара в каталоге
+var changeGoodCatalogAmount = function (goodId, changeValue) {
   var catalogCards = document.querySelector('.catalog__cards');
   var catalogGoodCard = catalogCards.children[goodId + 1];
 
-  goodsCatalog[goodId]['amount']--;
-  setAmountGoodClases(catalogGoodCard, goodId);
-};
-
-// Функция увеличивает количества товара в каталоге
-var increaseGoodCatalogAmount = function (goodId) {
-  var catalogCards = document.querySelector('.catalog__cards');
-  var catalogGoodCard = catalogCards.children[goodId + 1];
-
-  goodsCatalog[goodId]['amount']++;
+  goodsCatalog[goodId]['amount'] += changeValue;
   setAmountGoodClases(catalogGoodCard, goodId);
 };
 
@@ -409,26 +286,6 @@ var restoreGoodCatalogAmount = function (goodId) {
     }
   }
 };
-// Функция уменьшает количества товара в корзине
-var decreaseBasketGoodCount = function (basketGoodsCards, goodId) {
-  // Проверяем количество товара в корзине
-  for (var i = 0; i < goodsBasket.length; i++) {
-    if (goodsBasket[i]['id'] === goodId) {
-      goodsBasket[i]['orderedAmount']--;
-      increaseGoodCatalogAmount(goodId);
-      if (goodsBasket[i]['orderedAmount'] > 0) {
-        var goodOrderCount = basketGoodsCards.children[i + 1].querySelector('.card-order__count');
-        goodOrderCount.value = goodsBasket[i]['orderedAmount'];
-        calculateBasketAmount(basketGoodsCards);
-        return;
-      } else {
-        removeGoodFromBasket(goodId);
-        calculateBasketAmount(basketGoodsCards);
-        return;
-      }
-    }
-  }
-};
 
 // Функция увеличивает количества товара в корзине
 var increaseBasketGoodCount = function (basketGoodsCards, goodId) {
@@ -442,44 +299,32 @@ var increaseBasketGoodCount = function (basketGoodsCards, goodId) {
       goodsBasket[i]['orderedAmount']++;
       goodOrderCount = basketGoodsCards.children[i + 1].querySelector('.card-order__count');
       goodOrderCount.value = goodsBasket[i]['orderedAmount'];
-      decreaseGoodCatalogAmount(goodId);
+      changeGoodCatalogAmount(goodId, -1);
       calculateBasketAmount(basketGoodsCards);
       return;
     }
   }
 };
 
-// Функция удаления товара из карзины
-var removeGoodFromBasket = function (goodId) {
-  var basket = document.querySelector('.goods__cards');
-
+// Функция уменьшает количества товара в корзине
+var decreaseBasketGoodCount = function (basketGoodsCards, goodId) {
+  // Проверяем количество товара в корзине
   for (var i = 0; i < goodsBasket.length; i++) {
     if (goodsBasket[i]['id'] === goodId) {
-      basket.removeChild(basket.children[i + 1]);
-      goodsBasket.splice(i, 1);
-      return;
+      goodsBasket[i]['orderedAmount']--;
+      changeGoodCatalogAmount(goodId, 1);
+      if (goodsBasket[i]['orderedAmount'] > 0) {
+        var goodOrderCount = basketGoodsCards.children[i + 1].querySelector('.card-order__count');
+        goodOrderCount.value = goodsBasket[i]['orderedAmount'];
+        calculateBasketAmount(basketGoodsCards);
+        return;
+      } else {
+        removeGoodFromBasket(goodId);
+        calculateBasketAmount(basketGoodsCards);
+        return;
+      }
     }
   }
-};
-
-// Функция заполнения каталога товаров
-var fillGoodsCatalog = function (catalogCards) {
-  var catalogLoad = document.querySelector('.catalog__load');
-  var goodCatalogCardTemplate = document.querySelector('#card').content.querySelector('article');
-  var goodsCardsFragment = document.createDocumentFragment();
-
-  hideLoadText(catalogCards, catalogLoad);
-
-  goodsCatalog.forEach(function (goodObj, i) {
-    goodObj['id'] = i;
-    var elementData = cloneCatalogGoodCardElement({
-      goodCatalogCardTemplate: goodCatalogCardTemplate,
-      goodObj: goodObj,
-    });
-    goodsCardsFragment.appendChild(elementData);
-  });
-
-  catalogCards.appendChild(goodsCardsFragment);
 };
 
 // Функция добавления товара в карзину
@@ -508,7 +353,7 @@ var addGoodToBasket = function (goodId) {
 
   showBasketGoodsTotal(basketGoodsTotal);
 
-  cloneBasketGoodCardElement({
+  createBasketGoodCardElement({
     goodBasketCardTemplate: goodBasketCardTemplate,
     basketElem: basketGoodsCards,
     goodObj: newGoodObjForBasket
@@ -517,9 +362,43 @@ var addGoodToBasket = function (goodId) {
   increaseBasketGoodCount(basketGoodsCards, goodId);
 };
 
+// Функция удаления товара из карзины
+var removeGoodFromBasket = function (goodId) {
+  var basket = document.querySelector('.goods__cards');
+
+  for (var i = 0; i < goodsBasket.length; i++) {
+    if (goodsBasket[i]['id'] === goodId) {
+      basket.removeChild(basket.children[i + 1]);
+      goodsBasket.splice(i, 1);
+      return;
+    }
+  }
+};
+
+// Функция заполнения каталога товаров
+var fillGoodsCatalog = function (catalogCards) {
+  var catalogLoad = document.querySelector('.catalog__load');
+  var goodCatalogCardTemplate = document.querySelector('#card').content.querySelector('article');
+  var goodsCardsFragment = document.createDocumentFragment();
+
+  hideLoadText(catalogCards, catalogLoad);
+
+  goodsCatalog.forEach(function (goodObj, i) {
+    goodObj['id'] = i;
+    var elementData = createCatalogGoodCardElement({
+      goodCatalogCardTemplate: goodCatalogCardTemplate,
+      goodObj: goodObj,
+    });
+    goodsCardsFragment.appendChild(elementData);
+  });
+
+  catalogCards.appendChild(goodsCardsFragment);
+};
+
 // Навешиваем события на каталог товаров
 var addGoodCatalogEvents = function (catalogCards) {
   catalogCards.addEventListener('click', function (evt) {
+    evt.preventDefault();
     var catalogGoodCard = evt.target.parentElement.parentElement.parentElement;
     var goodId = parseInt(catalogGoodCard.id, 10);
 
@@ -542,19 +421,20 @@ var addGoodCatalogEvents = function (catalogCards) {
 };
 
 // Навешиваем события на карзину товаров
-var addBasketEvents = function (basketGoodsCards) {
-  basketGoodsCards.addEventListener('click', function (evt) {
+var addBasketEvents = function (basketGoodsCardsElem) {
+  basketGoodsCardsElem.addEventListener('click', function (evt) {
+    evt.preventDefault();
     var basketGoodsCard = evt.target.parentElement.parentElement.parentElement;
     var goodId = parseInt(basketGoodsCard.id, 10);
 
     // Уменьшаем количества товара в корзине
     if (evt.target.className === 'card-order__btn card-order__btn--decrease') {
-      decreaseBasketGoodCount(basketGoodsCards, goodId);
+      decreaseBasketGoodCount(basketGoodsCardsElem, goodId);
     }
 
     // Увеличиваем количества товара в корзине
     if (evt.target.className === 'card-order__btn card-order__btn--increase') {
-      increaseBasketGoodCount(basketGoodsCards, goodId);
+      increaseBasketGoodCount(basketGoodsCardsElem, goodId);
     }
 
     // Удаляем товар из корзины и увеличиваем остаток в каталоге
@@ -564,7 +444,7 @@ var addBasketEvents = function (basketGoodsCards) {
 
       restoreGoodCatalogAmount(goodId);
       removeGoodFromBasket(goodId);
-      calculateBasketAmount(basketGoodsCards);
+      calculateBasketAmount(basketGoodsCardsElem);
     }
   });
 };
@@ -636,6 +516,7 @@ var addDeliverEvents = function (deliverForm) {
 // Навешиваем события на ползунок фильтра
 var addPriceFilterEvents = function (rangePriceFilter) {
   rangePriceFilter.addEventListener('mouseup', function (evt) {
+    evt.preventDefault();
     var rangeBtnClassName = evt.target.className;
     var rangePriceText = rangePriceFilter.nextElementSibling;
     var rangePriceMinText = rangePriceText.children[0];
@@ -652,17 +533,17 @@ var addPriceFilterEvents = function (rangePriceFilter) {
 
 // Функция основных действий
 var main = function () {
-  var catalogCards = document.querySelector('.catalog__cards');
-  var basketGoodsCards = document.querySelector('.goods__cards');
+  var catalogCardsElem = document.querySelector('.catalog__cards');
+  var basketGoodsCardsElem = document.querySelector('.goods__cards');
   var paymentForm = document.querySelector('.payment');
   var deliverForm = document.querySelector('.deliver');
   var rangePriceFilter = document.querySelector('.range__filter');
 
-  fillGoodsCatalog(catalogCards);
+  fillGoodsCatalog(catalogCardsElem);
 
-  addGoodCatalogEvents(catalogCards);
+  addGoodCatalogEvents(catalogCardsElem);
 
-  addBasketEvents(basketGoodsCards);
+  addBasketEvents(basketGoodsCardsElem);
 
   addPaymentEvents(paymentForm);
 
@@ -671,10 +552,117 @@ var main = function () {
   addPriceFilterEvents(rangePriceFilter);
 };
 
+// Данные
+var goodNames = [
+  'Чесночные сливки',
+  'Огуречный педант',
+  'Молочная хрюша',
+  'Грибной шейк',
+  'Баклажановое безумие',
+  'Паприколу итальяно',
+  'Нинзя-удар васаби',
+  'Хитрый баклажан',
+  'Горчичный вызов',
+  'Кедровая липучка',
+  'Корманный портвейн',
+  'Чилийский задира',
+  'Беконовый взрыв',
+  'Арахис vs виноград',
+  'Сельдерейная душа',
+  'Початок в бутылке',
+  'Чернющий мистер чеснок',
+  'Раша федераша',
+  'Кислая мина',
+  'Кукурузное утро',
+  'Икорный фуршет',
+  'Новогоднее настроение',
+  'С пивком потянет',
+  'Мисс креветка',
+  'Бесконечный взрыв',
+  'Невинные винные',
+  'Бельгийское пенное',
+  'Острый язычок'];
+
+var imgNames = [
+  'gum-cedar',
+  'gum-chile',
+  'gum-eggplant',
+  'gum-mustard',
+  'gum-portwine',
+  'gum-wasabi',
+  'ice-cucumber',
+  'ice-eggplant',
+  'ice-garlic',
+  'ice-italian',
+  'ice-mushroom',
+  'ice-pig',
+  'marmalade-beer',
+  'marmalade-caviar',
+  'marmalade-corn',
+  'marmalade-new-year',
+  'marmalade-sour',
+  'marshmallow-bacon',
+  'marshmallow-beer',
+  'marshmallow-shrimp',
+  'marshmallow-spicy',
+  'marshmallow-wine',
+  'soda-bacon',
+  'soda-celery',
+  'soda-cob',
+  'soda-garlic',
+  'soda-peanut-grapes',
+  'soda-russian'
+];
+
+var rating = {
+  'value': 1, // число — оценка: целое число от 1 до 5
+  'number': 15 // число — количество оценок: целое число от 10 до 900
+};
+
+var contents = [
+  'молоко',
+  'сливки',
+  'вода',
+  'пищевой краситель',
+  'патока',
+  'ароматизатор бекона',
+  'ароматизатор свинца',
+  'ароматизатор дуба, идентичный натуральному',
+  'ароматизатор картофеля',
+  'лимонная кислота',
+  'загуститель',
+  'эмульгатор',
+  'консервант: сорбат калия',
+  'посолочная смесь: соль, нитрит натрия',
+  'ксилит',
+  'карбамид',
+  'вилларибо',
+  'виллабаджо'
+];
+
+var nutritionFacts = {
+  sugar: true, // булево значение — содержание сахара. Значение генерируется случайным образом
+  energy: getRandomValueRange(70, 500), // число — энергетическая ценность: целое число от 70 до 500
+  generateContents: function () { // строка — состав: сгенерированная случайным образом строка. Для генерации состава нужно выбрать произвольное количество значений, перечисленных ниже и соединить их через запятую
+    var contentsString = '';
+    var contentsNumber = getRandomValueRange(1, contents.length);
+    if (contentsNumber === 0) {
+      contentsNumber = 1;
+    }
+    for (var i = 0; i < contentsNumber; i++) {
+      contentsString += contents[getRandomValueRange(1, contents.length)];
+      if ((contentsNumber - i) > 1) {
+        contentsString += ', ';
+      }
+    }
+    return contentsString;
+  }
+};
+
 var goodsCatalog = createGoodsArray({
-  goodsNumber: 3,
+  goodsNumber: getRandomValueRange(0, 20),
   goodNames: goodNames,
-  imgPaths: imgPaths,
+  imgPaths: imgNames,
   rating: rating,
   nutritionFacts: nutritionFacts
 });
