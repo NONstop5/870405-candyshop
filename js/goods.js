@@ -61,18 +61,121 @@ var createNewElement = function (tagName, className, textContent) {
 };
 
 // Функция создания массива товаров каталога
-var createGoodsArray = function (dataSet) {
+var createGoodsArray = function () {
+  // Данные
+  var goodNames = [
+    'Чесночные сливки',
+    'Огуречный педант',
+    'Молочная хрюша',
+    'Грибной шейк',
+    'Баклажановое безумие',
+    'Паприколу итальяно',
+    'Нинзя-удар васаби',
+    'Хитрый баклажан',
+    'Горчичный вызов',
+    'Кедровая липучка',
+    'Корманный портвейн',
+    'Чилийский задира',
+    'Беконовый взрыв',
+    'Арахис vs виноград',
+    'Сельдерейная душа',
+    'Початок в бутылке',
+    'Чернющий мистер чеснок',
+    'Раша федераша',
+    'Кислая мина',
+    'Кукурузное утро',
+    'Икорный фуршет',
+    'Новогоднее настроение',
+    'С пивком потянет',
+    'Мисс креветка',
+    'Бесконечный взрыв',
+    'Невинные винные',
+    'Бельгийское пенное',
+    'Острый язычок'
+  ];
+  var imgNames = [
+    'gum-cedar',
+    'gum-chile',
+    'gum-eggplant',
+    'gum-mustard',
+    'gum-portwine',
+    'gum-wasabi',
+    'ice-cucumber',
+    'ice-eggplant',
+    'ice-garlic',
+    'ice-italian',
+    'ice-mushroom',
+    'ice-pig',
+    'marmalade-beer',
+    'marmalade-caviar',
+    'marmalade-corn',
+    'marmalade-new-year',
+    'marmalade-sour',
+    'marshmallow-bacon',
+    'marshmallow-beer',
+    'marshmallow-shrimp',
+    'marshmallow-spicy',
+    'marshmallow-wine',
+    'soda-bacon',
+    'soda-celery',
+    'soda-cob',
+    'soda-garlic',
+    'soda-peanut-grapes',
+    'soda-russian'
+  ];
+  var contents = [
+    'молоко',
+    'сливки',
+    'вода',
+    'пищевой краситель',
+    'патока',
+    'ароматизатор бекона',
+    'ароматизатор свинца',
+    'ароматизатор дуба, идентичный натуральному',
+    'ароматизатор картофеля',
+    'лимонная кислота',
+    'загуститель',
+    'эмульгатор',
+    'консервант: сорбат калия',
+    'посолочная смесь: соль, нитрит натрия',
+    'ксилит',
+    'карбамид',
+    'вилларибо',
+    'виллабаджо'
+  ];
+  var goodsNumber = getRandomValueRange(0, 20);
+
   var goods = [];
 
-  for (var i = 0; i < dataSet.goodsNumber; i++) {
+  for (var i = 0; i < goodsNumber; i++) {
     goods[i] = {
-      'name': dataSet.goodNames[getRandomValueRange(goodNames.length)], // строка — название. Произвольная строка из нижеперечисленных
-      'picture': IMG_PATH + dataSet.imgPaths[getRandomValueRange(1, imgNames.length)] + IMG_EXTENSION, // строка — адрес изображения для товара. Случайное значение из массива, содержащего
+      'name': goodNames[getRandomValueRange(0, goodNames.length)], // строка — название. Произвольная строка из нижеперечисленных
+      'picture': IMG_PATH + imgNames[getRandomValueRange(0, imgNames.length - 1)] + IMG_EXTENSION, // строка — адрес изображения для товара. Случайное значение из массива, содержащего
       'amount': getRandomValueRange(0, 20), // число — количество, число от 0 до 20
       'price': getRandomValueRange(100, 1500), // число — стоимость, от 100 до 1500
       'weight': getRandomValueRange(30, 300), // число — вес в граммах, от 30 до 300
-      'rating': dataSet.rating, // объект — рейтинг: объект со следующими полями
-      'nutritionFacts': dataSet.nutritionFacts // объект — состав: объект со следующими полями
+      'rating': { // объект — рейтинг: объект со следующими полями
+        'value': getRandomValueRange(1, 5), // число — оценка: целое число от 1 до 5
+        'number': getRandomValueRange(10, 900) // число — количество оценок: целое число от 10 до 900
+      },
+      'nutritionFacts': { // объект — состав: объект со следующими полями
+        sugar: !!getRandomValueRange(0, 1), // булево значение — содержание сахара. Значение генерируется случайным образом
+        energy: getRandomValueRange(70, 500), // число — энергетическая ценность: целое число от 70 до 500
+        generateContents: function () { // строка — состав: сгенерированная случайным образом строка. Для генерации состава нужно выбрать произвольное количество значений, перечисленных ниже и соединить их через запятую
+          var contentsString = '';
+          var contentsNumber = getRandomValueRange(1, contents.length - 1);
+          if (contentsNumber === 0) {
+            contentsNumber = 1;
+          }
+          for (var n = 0; n < contentsNumber; n++) {
+            contentsString += contents[getRandomValueRange(1, contents.length - 1)];
+            if ((contentsNumber - n) > 1) {
+              contentsString += ', ';
+            }
+          }
+          return contentsString;
+        }
+      }
     };
   }
 
@@ -552,120 +655,7 @@ var main = function () {
   addPriceFilterEvents(rangePriceFilter);
 };
 
-// Данные
-var goodNames = [
-  'Чесночные сливки',
-  'Огуречный педант',
-  'Молочная хрюша',
-  'Грибной шейк',
-  'Баклажановое безумие',
-  'Паприколу итальяно',
-  'Нинзя-удар васаби',
-  'Хитрый баклажан',
-  'Горчичный вызов',
-  'Кедровая липучка',
-  'Корманный портвейн',
-  'Чилийский задира',
-  'Беконовый взрыв',
-  'Арахис vs виноград',
-  'Сельдерейная душа',
-  'Початок в бутылке',
-  'Чернющий мистер чеснок',
-  'Раша федераша',
-  'Кислая мина',
-  'Кукурузное утро',
-  'Икорный фуршет',
-  'Новогоднее настроение',
-  'С пивком потянет',
-  'Мисс креветка',
-  'Бесконечный взрыв',
-  'Невинные винные',
-  'Бельгийское пенное',
-  'Острый язычок'];
-
-var imgNames = [
-  'gum-cedar',
-  'gum-chile',
-  'gum-eggplant',
-  'gum-mustard',
-  'gum-portwine',
-  'gum-wasabi',
-  'ice-cucumber',
-  'ice-eggplant',
-  'ice-garlic',
-  'ice-italian',
-  'ice-mushroom',
-  'ice-pig',
-  'marmalade-beer',
-  'marmalade-caviar',
-  'marmalade-corn',
-  'marmalade-new-year',
-  'marmalade-sour',
-  'marshmallow-bacon',
-  'marshmallow-beer',
-  'marshmallow-shrimp',
-  'marshmallow-spicy',
-  'marshmallow-wine',
-  'soda-bacon',
-  'soda-celery',
-  'soda-cob',
-  'soda-garlic',
-  'soda-peanut-grapes',
-  'soda-russian'
-];
-
-var rating = {
-  'value': 1, // число — оценка: целое число от 1 до 5
-  'number': 15 // число — количество оценок: целое число от 10 до 900
-};
-
-var contents = [
-  'молоко',
-  'сливки',
-  'вода',
-  'пищевой краситель',
-  'патока',
-  'ароматизатор бекона',
-  'ароматизатор свинца',
-  'ароматизатор дуба, идентичный натуральному',
-  'ароматизатор картофеля',
-  'лимонная кислота',
-  'загуститель',
-  'эмульгатор',
-  'консервант: сорбат калия',
-  'посолочная смесь: соль, нитрит натрия',
-  'ксилит',
-  'карбамид',
-  'вилларибо',
-  'виллабаджо'
-];
-
-var nutritionFacts = {
-  sugar: true, // булево значение — содержание сахара. Значение генерируется случайным образом
-  energy: getRandomValueRange(70, 500), // число — энергетическая ценность: целое число от 70 до 500
-  generateContents: function () { // строка — состав: сгенерированная случайным образом строка. Для генерации состава нужно выбрать произвольное количество значений, перечисленных ниже и соединить их через запятую
-    var contentsString = '';
-    var contentsNumber = getRandomValueRange(1, contents.length);
-    if (contentsNumber === 0) {
-      contentsNumber = 1;
-    }
-    for (var i = 0; i < contentsNumber; i++) {
-      contentsString += contents[getRandomValueRange(1, contents.length)];
-      if ((contentsNumber - i) > 1) {
-        contentsString += ', ';
-      }
-    }
-    return contentsString;
-  }
-};
-
-var goodsCatalog = createGoodsArray({
-  goodsNumber: getRandomValueRange(0, 20),
-  goodNames: goodNames,
-  imgPaths: imgNames,
-  rating: rating,
-  nutritionFacts: nutritionFacts
-});
+var goodsCatalog = createGoodsArray();
 
 var goodsBasket = [];
 
