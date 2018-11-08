@@ -9,6 +9,23 @@ var getRandomValueRange = function (minValue, maxValue) {
   return Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue;
 };
 
+// Функция перемешивает и возвращает, изначально, переданный массив
+var shuffleArray = function (array) {
+  for (var i = 0; i < array.length; i++) {
+    var rndArrIndex = getRandomValueRange(0, array.length - 1);
+    var tmpValue = array[i];
+    array[i] = array[rndArrIndex];
+    array[rndArrIndex] = tmpValue;
+  }
+
+  return array;
+};
+
+// Функция создания массива из случайных элементов передаваемого массива
+var getRandomArray = function (array) {
+  return shuffleArray(array).slice(getRandomValueRange(1, array.length - 1));
+};
+
 // Функция проверки корректности номера кредитной карты
 var checkCreditCardNumber = function (cardNumValue) {
   var charNumArr = cardNumValue.split('');
@@ -161,20 +178,9 @@ var createGoodsArray = function () {
       'nutritionFacts': { // объект — состав: объект со следующими полями
         sugar: !!getRandomValueRange(0, 1), // булево значение — содержание сахара. Значение генерируется случайным образом
         energy: getRandomValueRange(70, 500), // число — энергетическая ценность: целое число от 70 до 500
-        generateContents: function () { // строка — состав: сгенерированная случайным образом строка. Для генерации состава нужно выбрать произвольное количество значений, перечисленных ниже и соединить их через запятую
-          var contentsString = '';
-          var contentsNumber = getRandomValueRange(1, contents.length - 1);
-          if (contentsNumber === 0) {
-            contentsNumber = 1;
-          }
-          for (var n = 0; n < contentsNumber; n++) {
-            contentsString += contents[getRandomValueRange(1, contents.length - 1)];
-            if ((contentsNumber - n) > 1) {
-              contentsString += ', ';
-            }
-          }
-          return contentsString;
-        }
+        generateContents: function () {
+          return getRandomArray(contents).join(', ');
+        } // строка — состав: сгенерированная случайным образом строка. Для генерации состава нужно выбрать произвольное количество значений, перечисленных ниже и соединить их через запятую
       }
     };
   }
