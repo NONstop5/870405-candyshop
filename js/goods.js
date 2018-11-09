@@ -160,27 +160,25 @@ var createGoodsArray = function () {
     'вилларибо',
     'виллабаджо'
   ];
-  var goodsNumber = getRandomValueRange(0, 20);
+  var goodsNumber = 26;
 
   var goods = [];
 
   for (var i = 0; i < goodsNumber; i++) {
     goods[i] = {
-      'name': goodNames[getRandomValueRange(0, goodNames.length)], // строка — название. Произвольная строка из нижеперечисленных
-      'picture': IMG_PATH + imgNames[getRandomValueRange(0, imgNames.length - 1)] + IMG_EXTENSION, // строка — адрес изображения для товара. Случайное значение из массива, содержащего
-      'amount': getRandomValueRange(0, 20), // число — количество, число от 0 до 20
-      'price': getRandomValueRange(100, 1500), // число — стоимость, от 100 до 1500
-      'weight': getRandomValueRange(30, 300), // число — вес в граммах, от 30 до 300
-      'rating': { // объект — рейтинг: объект со следующими полями
-        'value': getRandomValueRange(1, 5), // число — оценка: целое число от 1 до 5
-        'number': getRandomValueRange(10, 900) // число — количество оценок: целое число от 10 до 900
+      name: goodNames[getRandomValueRange(0, goodNames.length - 1)], // строка — название. Произвольная строка из нижеперечисленных
+      picture: IMG_PATH + imgNames[getRandomValueRange(0, imgNames.length - 1)] + IMG_EXTENSION, // строка — адрес изображения для товара. Случайное значение из массива, содержащего
+      amount: getRandomValueRange(0, 20), // число — количество, число от 0 до 20
+      price: getRandomValueRange(100, 1500), // число — стоимость, от 100 до 1500
+      weight: getRandomValueRange(30, 300), // число — вес в граммах, от 30 до 300
+      rating: { // объект — рейтинг: объект со следующими полями
+        value: getRandomValueRange(1, 5), // число — оценка: целое число от 1 до 5
+        number: getRandomValueRange(10, 900) // число — количество оценок: целое число от 10 до 900
       },
-      'nutritionFacts': { // объект — состав: объект со следующими полями
+      nutritionFacts: { // объект — состав: объект со следующими полями
         sugar: !!getRandomValueRange(0, 1), // булево значение — содержание сахара. Значение генерируется случайным образом
         energy: getRandomValueRange(70, 500), // число — энергетическая ценность: целое число от 70 до 500
-        generateContents: function () {
-          return getRandomArray(contents).join(', ');
-        } // строка — состав: сгенерированная случайным образом строка. Для генерации состава нужно выбрать произвольное количество значений, перечисленных ниже и соединить их через запятую
+        generateContents: getRandomArray(contents).join(', ') // строка — состав: сгенерированная случайным образом строка. Для генерации состава нужно выбрать произвольное количество значений, перечисленных ниже и соединить их через запятую
       }
     };
   }
@@ -240,7 +238,7 @@ var setAmountGoodClases = function (catalogGoodCard, goodId) {
   catalogGoodCard.classList.add(getAmmountClass(goodsCatalog[goodId]));
 };
 
-// Функция клонирования карточки товара для каталога
+// Функция создания карточки товара для каталога
 var createCatalogGoodCardElement = function (elementData) {
   var goodCard = elementData.goodCatalogCardTemplate.cloneNode(true);
   var cardImgElem = goodCard.querySelector('.card__img');
@@ -281,7 +279,7 @@ var createCatalogGoodCardElement = function (elementData) {
 
   // nutritionFacts
   goodCard.querySelector('.card__characteristic').textContent = shugarType + '. ' + elementData.goodObj['nutritionFacts'].energy + ' ккал';
-  goodCard.querySelector('.card__composition-list').textContent = elementData.goodObj['nutritionFacts'].generateContents();
+  goodCard.querySelector('.card__composition-list').textContent = elementData.goodObj['nutritionFacts'].generateContents;
 
   return goodCard;
 };
