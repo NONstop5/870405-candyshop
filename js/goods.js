@@ -110,6 +110,7 @@ var createGoodsArray = function () {
     'Бельгийское пенное',
     'Острый язычок'
   ];
+  goodNames = shuffleArray(goodNames);
   var imgNames = [
     'gum-cedar',
     'gum-chile',
@@ -140,6 +141,7 @@ var createGoodsArray = function () {
     'soda-peanut-grapes',
     'soda-russian'
   ];
+  imgNames = shuffleArray(imgNames);
   var contents = [
     'молоко',
     'сливки',
@@ -166,8 +168,8 @@ var createGoodsArray = function () {
 
   for (var i = 0; i < goodsNumber; i++) {
     goods[i] = {
-      name: goodNames[getRandomValueRange(0, goodNames.length - 1)], // строка — название. Произвольная строка из нижеперечисленных
-      picture: IMG_PATH + imgNames[getRandomValueRange(0, imgNames.length - 1)] + IMG_EXTENSION, // строка — адрес изображения для товара. Случайное значение из массива, содержащего
+      name: goodNames[i], // строка — название. Произвольная строка из нижеперечисленных
+      picture: IMG_PATH + imgNames[i] + IMG_EXTENSION, // строка — адрес изображения для товара. Случайное значение из массива, содержащего
       amount: getRandomValueRange(0, 20), // число — количество, число от 0 до 20
       price: getRandomValueRange(100, 1500), // число — стоимость, от 100 до 1500
       weight: getRandomValueRange(30, 300), // число — вес в граммах, от 30 до 300
